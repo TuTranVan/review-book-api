@@ -1,0 +1,25 @@
+class Api::V1::SessionsController < Devise::SessionsController
+  before_action :load_user, only: :create
+
+  # sign in
+  def create
+    if @user.valid_password?(sign_in_params[:password])
+      sign_in "user", @user
+      json_response "Sign in successfully", true, { user: @user }, :ok
+    else
+      json_response "Unauthorized", false, {}, :unauthorized
+    end
+  end
+
+  private
+
+  def sign_in_params
+    params.require(:sign_in).permit(:email, :password)
+  end
+
+  def load_user
+    @user = User.find_for_database_authentication(email: sign_in_params[:email])
+    return if @user
+    json_response "Can't get user", false, {}, :failure
+  end
+end
