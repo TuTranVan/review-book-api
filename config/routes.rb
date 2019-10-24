@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       devise_scope :user do
@@ -7,7 +8,9 @@ Rails.application.routes.draw do
         delete "log_out", to: "sessions#destroy"
       end
       post "facebook", to: "users#facebook"
-      resources :books, only: [:index, :show]
+      resources :books, only: [:index, :show] do
+        resources :reviews
+      end
     end
   end
 end
